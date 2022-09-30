@@ -38,7 +38,6 @@ int main(int argc, char *argv[argc + 1])
 	FreeStruct(args); 
 	
 	return EXIT_SUCCESS; 
-
 }
 
 void FreeStruct(Args *args)
@@ -136,6 +135,26 @@ void* FindFile(void *vargs)
 	
 	printf("file: %s\n", args->file_n); 
 	printf("dir:  %s\n", args->dir_n); 
+
+	DIR *dir;
+	struct dirent *drnt;
+
+	// New thread
+	pthread_t ndir_t;
+	int ndir; 
+
+	// For current dir
+	char *cwd = (char*)calloc(100,sizeof(char));
+	char *newPath = (char*)calloc(100,sizeof(char)); 
+
+	chdir(args->dir_n); 
+
+	getcwd(cwd, sizeof(cwd));
+
+	printf("%s\n", cwd); 
+
+	free(cwd);
+	free(newPath); 
 
 	pthread_exit(EXIT_SUCCESS); 
 }
