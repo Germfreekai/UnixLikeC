@@ -7,6 +7,7 @@ Instead it checks a file called _mlocate.db_ which contains references to stored
 This data base is usually located at /var/lib/mlocate/ and is updated every 24h by _updatedb_ which can be executed manually as well (sudo updatedb). 
 So if you look for a recently created file using _locate_ before _updatedb_ is executed, you will not find your desired result. 
 
+Initially I intended to implement this command, but as no DB will be mantain, I will Implement 'find' command
 ---
 ## C implementation 
 For this implementation using C, I will use threads, structures and dynamic allocated memory. 
