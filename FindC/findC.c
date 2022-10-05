@@ -9,6 +9,7 @@
 #include <dirent.h>
 #include <pthread.h>
 #include <regex.h>
+#include <unistd.h>
 
 typedef struct 
 {
@@ -144,16 +145,51 @@ void* FindFile(void *vargs)
 	int ndir; 
 
 	// For current dir
-	char *cwd = (char*)calloc(100,sizeof(char));
-	char *newPath = (char*)calloc(100,sizeof(char)); 
+	char cwd[1000]; 
+	char *newPath = (char*)calloc(1000,sizeof(char)); 
 
 	chdir(args->dir_n); 
 
-	getcwd(cwd, sizeof(cwd));
+	if (!getcwd(cwd, sizeof(cwd)))
+	{
+		printf("ERROR: Retrieving working directory\n"); 
+		pthread_exit(0); 
+	}
 
-	printf("%s\n", cwd); 
+	// Open working directory
+	// If dir == NULL
+	dir = opendir(cwd);
+	if (!dir)
+	{
+		printf("ERROR: Invalid dir: %s\n", cwd); 
+		pthread_exit(0); 
+	}
 
-	free(cwd);
+	printf("cwd : %s \n", cwd); 
+
+	// While reading, return files
+	while ((drnt = readdir(dir)))
+	{
+		// strcmp returns 0 if equal
+		// Skip father and current directory
+		if (!strcmp(drnt->d_name, ".") || !strcmp(drnt->d_name, ".."))
+		{
+			continue;
+		}
+		else if (drnt->d_type == DT_DIR)
+		{
+			printf("-> %s - is a directory\n", drnt->d_name); 
+		}
+		else
+		{
+			printf("--> %s - is a file\n", drnt->d_name); 
+		}
+	}
+
+	// Close dir
+	closedir(dir); 
+
+	// Free memory 
 	free(newPath); 
 
 	pthread_exit(EXIT_SUCCESS); 
