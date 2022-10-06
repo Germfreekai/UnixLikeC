@@ -15,9 +15,9 @@ I will not create a database nor check on an existing one, instead I will go thr
 
 You can run looking for exact match name.extension or name or .extension 
 Examples 
-- ./findC.out -d path/to/dir -f .c
-- ./findC.out -d path/to/dir -f file
-- ./findC.out -d path/to/dir -f file.c
+- ./findC -d path/to/dir -f .c
+- ./findC -d path/to/dir -f file
+- ./findC -d path/to/dir -f file.c
 
 ---
 ## Goals 
