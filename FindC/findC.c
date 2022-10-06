@@ -18,10 +18,13 @@ typedef struct
 }Args;
 
 void Help(void); 
-Args* GetFlags(int argc, char **argv); 
+Args *GetFlags(int argc, char **argv); 
 void PrintError(void);
 void FreeStruct(Args *args);
 void* FindFile(void *vargs); 
+char *FileName(char *fname); 
+int CmpNames(char *gfile, char *cfile);
+char *FileExt(char *fname);
 
 int main(int argc, char *argv[argc + 1])
 {
@@ -53,11 +56,11 @@ void PrintError(void)
 	printf("Wrong usage - Invalid flag or argument, run with <-h> for more information\n"); 
 }
 
-Args* GetFlags(int argc, char **argv)
+Args *GetFlags(int argc, char **argv)
 {
 	Args* args = (Args*)malloc(sizeof(Args)); 
-	args->file_n = (char*)calloc(100,sizeof(char));
-	args->dir_n = (char*)calloc(100,sizeof(char)); 
+	args->file_n = (char*)calloc(1000,sizeof(char));
+	args->dir_n = (char*)calloc(1000,sizeof(char)); 
 	char *flag = (char*)calloc(3,sizeof(char)); 
 	
 	if (strlen(argv[1]) > 2)
@@ -134,9 +137,6 @@ void* FindFile(void *vargs)
 {
 	Args* args = (Args*)vargs; 
 	
-	printf("file: %s\n", args->file_n); 
-	printf("dir:  %s\n", args->dir_n); 
-
 	DIR *dir;
 	struct dirent *drnt;
 
@@ -146,8 +146,8 @@ void* FindFile(void *vargs)
 
 	// For current dir
 	char cwd[1000]; 
-	char *newPath = (char*)calloc(1000,sizeof(char)); 
 
+	// Go to given directory 
 	chdir(args->dir_n); 
 
 	if (!getcwd(cwd, sizeof(cwd)))
@@ -165,8 +165,6 @@ void* FindFile(void *vargs)
 		pthread_exit(0); 
 	}
 
-	printf("cwd : %s \n", cwd); 
-
 	// While reading, return files
 	while ((drnt = readdir(dir)))
 	{
@@ -176,21 +174,192 @@ void* FindFile(void *vargs)
 		{
 			continue;
 		}
+		// If a directroy, create new thread
 		else if (drnt->d_type == DT_DIR)
 		{
-			printf("-> %s - is a directory\n", drnt->d_name); 
+			char *newPath = (char*)calloc(1000,sizeof(char)); 
+			
+			strcpy(newPath, cwd); 
+			strcat(newPath, "/");
+
+			// Path to new dir
+			strcat(newPath, drnt->d_name); 
+
+			// Pass new directory 
+			strcpy(args->dir_n, newPath); 
+
+			// Create new thread
+			ndir = pthread_create (&ndir_t, NULL, FindFile, (void*)args); 
+			pthread_join (ndir_t, NULL); 
+
+			// When returned, we need to go up a level 
+			chdir (".."); 
+			getcwd(cwd, sizeof(cwd)); 
+
+			// Return to father directory 
+			strcpy(args->dir_n, cwd); 
+
+			free(newPath); 
 		}
 		else
 		{
-			printf("--> %s - is a file\n", drnt->d_name); 
+			char *name_wext = FileName(drnt->d_name); 
+
+			char *ext = FileExt(drnt->d_name); 
+
+			int o; 
+			o = 0; 
+			int a; 
+			a = 0;
+
+			if (ext)
+			{
+				if(!CmpNames(args->file_n, ext))
+					a = 1; 
+			}
+			
+			if (name_wext)
+			{
+				if (!CmpNames(args->file_n, name_wext) || !CmpNames(args->file_n, drnt->d_name))
+					o = 1;
+			}
+			else
+			{
+				if (!CmpNames(args->file_n, drnt->d_name))
+					o = 1; 
+			}
+
+			if (o || a)
+			{
+				char *fullPathName = (char*)calloc(1000,sizeof(char)); 
+				
+				strcpy(fullPathName, cwd);
+				strcat(fullPathName, "/"); 
+				strcat(fullPathName, drnt->d_name);
+				
+				printf("> %s\n", fullPathName); 
+
+				free(fullPathName); 
+			}
+			
+			free(ext); 
+			free(name_wext); 
 		}
 	}
 
 	// Close dir
 	closedir(dir); 
 
-	// Free memory 
-	free(newPath); 
-
 	pthread_exit(EXIT_SUCCESS); 
+}
+
+char *FileExt(char *fname)
+{
+	char *ext = (char*)calloc(20,sizeof(char)); 
+
+	int flen = strlen(fname); 
+
+	int elen; 
+	elen = 0; 
+
+	for (int i = flen - 1; i >= 0; i--)
+	{
+		if (fname[i] != '.')
+		{
+			elen++;
+		}
+		else
+		{
+			elen++;
+			i = -1; 
+		}
+	}
+
+	// If no extension or starts with . 
+	if (elen == flen)
+	{
+		free(ext); 
+		return NULL;
+	}
+	
+	for (int i = flen - elen; i < flen; i++)
+	{
+		if ( i == flen - elen)
+		{
+			snprintf(ext, 2, "%c", fname[i]); 
+		}
+		else
+		{
+			strncat(ext, &fname[i], 1); 
+		}
+	}
+
+	return ext; 
+
+}
+
+char *FileName(char *fname)
+{
+	char *name = (char*)calloc(1000,sizeof(char)); 
+
+	int flen = strlen(fname); 
+
+	// Extension len 
+	int elen;
+	elen = 0; 
+
+	// Get extension size
+	for (int i = flen - 1; i >= 0; i--)
+	{
+		if (fname[i] != '.')
+		{
+			elen++; 
+		}
+		else
+		{
+			elen++;
+			i = -1;
+		}
+	}
+
+	// If no extension or starts with . 
+	if (elen == flen)
+	{
+		free(name); 
+		return NULL;
+	}
+
+	// Remove extension
+	for (int i = 0; i < flen - elen; i++)
+	{
+		if (!i)
+		{
+			snprintf(name, 2, "%c", fname[i]);
+		}
+		else
+		{
+			strncat(name, &fname[i], 1); 
+		}
+	}
+
+	return name; 
+}
+
+// gfile = given file name
+// cfile = calculated file name
+int CmpNames(char *gfile, char *cfile)
+{
+	if (strlen(gfile) != strlen(cfile))
+		return 1; 
+
+	while (*gfile)
+	{
+		if (gfile[0] != cfile[0])
+			return 1;
+
+		gfile++;
+		cfile++; 
+	}
+
+	return 0;
 }

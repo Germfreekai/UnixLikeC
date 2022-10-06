@@ -13,7 +13,13 @@ Initially I intended to implement this command, but as no DB will be mantain, I 
 For this implementation using C, I will use threads, structures and dynamic allocated memory. 
 I will not create a database nor check on an existing one, instead I will go through every folder and subfolder looking for matches. 
 
+You can run looking for exact match name.extension or name or .extension 
+Examples 
+- ./findC.out -d path/to/dir -f .c
+- ./findC.out -d path/to/dir -f file
+- ./findC.out -d path/to/dir -f file.c
+
 ---
 ## Goals 
 - Current goal is to look for exact matches, whether a dir or a file is located. 
-- TODO: Implement regular expressions search to find approximate results and to create a more look alike functionality to Unix locate command. 
+- TODO: Implement regular expressions search to find approximate results and to create a more look alike functionality to Unix locate/find command. 
