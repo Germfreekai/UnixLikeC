@@ -19,6 +19,7 @@ Examples
 - ./findC -d path/to/dir -f file
 - ./findC -d path/to/dir -f file.c
 
+Intentionally I avoided using 'strcmp' 
 ---
 ## Goals 
 - Current goal is to look for exact matches, whether a dir or a file is located. 
