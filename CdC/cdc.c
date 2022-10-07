@@ -1,3 +1,7 @@
+// Author: Rene Garcia Aviles
+// Cd like C implementation 
+// Contact: renega1238@gmail.com
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h> 
