@@ -57,7 +57,7 @@ void* Help (int argc, char **argv)
 err: 
 	free(flag); 
 	printf("Wrong usage, run with -h for more information\n"); 
-	exit(1); 
+	return NULL; 
 }
 
 void* CopyFile (char **argv)
@@ -89,6 +89,8 @@ void* CopyFile (char **argv)
 
 ferror: 
 	printf("Could not read file %s\n", argv[1]); 
+	fclose (file); 
+	fclose (wfile); 
 	exit(1); 
 }
 
@@ -97,7 +99,83 @@ void* CopyFilesToDir (int argc, char **argv)
 	FILE *file; 
 	char ch; 
 
+	char *dir = (char*)calloc(1000, sizeof(char)); 
+	strcpy(dir, argv[argc - 1]); 
+
+	for (size_t i = 1; i < argc - 1; i++)
+	{
+		char *fname = GetName(argv[i]); 
+
+		// argv simulation 
+		char **false_argv = (char**)calloc(3, sizeof(char*)); 
+		for (size_t a = 0; a <= 2; a++)
+			false_argv[a] = (char*)calloc(1000,sizeof(char)); 
+
+		char *fcfile = (char*)calloc(1000,sizeof(char)); 
+
+		strcpy(fcfile, dir); 
+		if (dir[strlen(dir)-1] != '/')
+			strcat(fcfile, "/"); 
+		strcat(fcfile, fname); 
+		
+		// Copy files
+		strcpy(false_argv[1],argv[i]);
+		strcpy(false_argv[2], fcfile); 
+
+		CopyFile(false_argv); 
+
+		for (size_t b = 0; b <= 2; b++)
+			free(false_argv[b]);
+		
+		free(false_argv); 
+		free(fname); 
+		free(fcfile); 
+	}
+
+	free(dir); 
 	return NULL; 
 }
 
-char *GetName(char *pfile); 
+char *GetName(char *pfile)
+{
+	char *fname = (char*)calloc(1000,sizeof(char)); 
+
+	int f_len = strlen(pfile); 
+
+	int count; 
+	count = 0; 
+
+	for (int i = f_len - 1; i >= 0; i--)
+	{
+		if (pfile[i] != '/')
+		{
+			count++;
+		}
+		else
+		{
+			i = -1;
+		}
+	}
+
+	if (f_len == count)
+	{
+		strcpy(fname, pfile);
+		return fname; 
+	}
+
+
+	for (int i = f_len - count; i < f_len; i++)
+	{
+		if (i == f_len - count)
+		{
+			snprintf(fname, 2, "%c", pfile[i]); 
+		}
+		else
+		{
+			strncat(fname, &pfile[i], 1); 
+		}
+	}
+	
+	return fname; 
+
+}
