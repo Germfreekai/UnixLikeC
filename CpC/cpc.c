@@ -8,7 +8,7 @@
 #include <assert.h>
 
 void* Help (int argc, char **argv); 
-void* CopyFile (char **argv); 
+int CopyFile (char **argv); 
 void* CopyFilesToDir (int argc, char **argv); 
 char *GetName(char *pfile); 
 
@@ -20,7 +20,9 @@ int main (int argc, char *argv[argc + 1])
 
 	if (argc == 3)
 	{
-		CopyFile (argv); 
+		int res = CopyFile (argv); 
+		if (res)
+			exit(1);
 	}
 	else if (argc > 3)
 	{
@@ -60,7 +62,7 @@ err:
 	return NULL; 
 }
 
-void* CopyFile (char **argv)
+int CopyFile (char **argv)
 {
 	FILE *file;
 	FILE *wfile; 
@@ -68,12 +70,13 @@ void* CopyFile (char **argv)
 
 	// Open file
 	file = fopen (argv[1], "r"); 
+	if (!file)
+		goto ferrorf; 
 
 	// Open file to write
 	wfile = fopen (argv[2], "w"); 
-	
-	if (!file || !wfile)
-		goto ferror; 
+	if (!wfile)
+		goto ferrort;
 
 	ch = 32; 
 	while ((ch = fgetc (file)) != EOF)
@@ -85,13 +88,14 @@ void* CopyFile (char **argv)
 	fclose (file); 
 	fclose (wfile); 
 
-	return NULL; 
+	return 0; 
 
-ferror: 
+ferrorf: 
 	printf("Could not read file %s\n", argv[1]); 
-	fclose (file); 
-	fclose (wfile); 
-	exit(1); 
+	return 1; 
+ferrort:
+	printf("Could not write into file: %s\n", argv[2]); 
+	return 1;
 }
 
 void* CopyFilesToDir (int argc, char **argv)
@@ -122,14 +126,20 @@ void* CopyFilesToDir (int argc, char **argv)
 		strcpy(false_argv[1],argv[i]);
 		strcpy(false_argv[2], fcfile); 
 
-		CopyFile(false_argv); 
+		int res = CopyFile(false_argv); 
 
 		for (size_t b = 0; b <= 2; b++)
 			free(false_argv[b]);
 		
 		free(false_argv); 
 		free(fname); 
-		free(fcfile); 
+		free(fcfile);
+
+		if (res)
+		{
+			free(dir); 
+			exit(1);	
+		}
 	}
 
 	free(dir); 
