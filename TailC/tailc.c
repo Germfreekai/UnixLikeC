@@ -3,15 +3,24 @@
 #include <assert.h>
 #include <string.h>
 #include <ctype.h>
+#include <signal.h>
+#include <unistd.h>
 
 void help(char **argv);
 void Tail(int argc, char **argv); 
-int get_file_lines_number(FILE *fptr);
-void tail_print_file(FILE *fptr, int F, int lines, int file_n_lines); 
+int get_file_lines_number();
+void tail_print_file(int F, int lines, int file_n_lines); 
+void keep_reading(); 
+void signalHandler(int sig); 
+
+FILE *fptr; 
 
 int main(int argc, char *argv[argc + 1])
 {
 	assert(argc > 1 && "Missing arguments, run with <-h> for more information"); 
+
+	// Control CTRL C 
+	signal(SIGINT, signalHandler); 
 
 	// Call help 
 	if (argc == 2 && !strcmp(argv[1], "-h"))
@@ -35,7 +44,7 @@ void help(char **argv)
 
 void Tail(int argc, char **argv)
 {
-	FILE *fptr; 
+	// FILE *fptr; 
 	
 	int lines; 
 	lines = 10;
@@ -90,7 +99,7 @@ void Tail(int argc, char **argv)
 	free(file); 
 
 	int file_n_lines;
-	file_n_lines = get_file_lines_number(fptr);
+	file_n_lines = get_file_lines_number();
 
 	if (!file_n_lines)
 	{
@@ -98,13 +107,13 @@ void Tail(int argc, char **argv)
 		exit(0); 
 	}
 	
-	tail_print_file(fptr, F, lines, file_n_lines); 
+	//tail_print_file(fptr, F, lines, file_n_lines); 
+	tail_print_file(F, lines, file_n_lines); 
 	
-	// fclose(fptr); 
 }
 
 // Count number of lines - so we can position our pointer
-int get_file_lines_number(FILE *fptr)
+int get_file_lines_number()
 {
 	char ch; 
 
@@ -120,7 +129,7 @@ int get_file_lines_number(FILE *fptr)
 	return count; 
 }
 
-void tail_print_file(FILE *fptr, int F, int lines, int file_n_lines)
+void tail_print_file(int F, int lines, int file_n_lines)
 {
 	// return file pointer to start of the file 
 	rewind(fptr); 
@@ -142,58 +151,14 @@ void tail_print_file(FILE *fptr, int F, int lines, int file_n_lines)
 	else
 	{
 		lines = file_n_lines - (lines - 1); 
-		//if (lines != 1)
-		//{
-		//	lines = file_n_lines - (lines - 1); 
-		//}
-		//else
-		//{
-		//	lines = file_n_lines - lines;
-		//}
 	}
 
-	//if (!lines)
-	//	print = 1; 
 	char ch; 
-
-	//printf("file_n_lines = %d\n", file_n_lines); 
-	//printf("lines = %d\n", lines); 
 
 	int count; 
 	count = 0; 
-	//while (count < lines && (ch = fgetc(fptr)) != EOF)
-	//{
-	//	if (ch == 10)
-	//		count++;
-	//}
-
-	//char *str = (char*)calloc(10001, sizeof(char)); 
-	////fgets(str, 10000, fptr); 
-	/////printf("%s", str); 
-	//printf("count = %d\n", count); 
-	//
-	//while ((ch = fgetc(fptr)) != EOF)
-	//{
-	//	putchar(ch);
-	//}
 	while ((ch = fgetc(fptr)) != EOF)
 	{
-		//if (lines == (file_n_lines - 1))
-		//{
-		//	if (count > lines)
-		//	{
-		//		printf("option 1 \n"); 
-		//		print = 1;
-		//	}
-		//}
-		//else
-		//{
-		//	if (count == lines)
-		//	{
-		//		printf("option 2 \n"); 
-		//		print = 1;
-		//	}
-		//}
 		if (count == lines)
 			print = 1;
 		if (print)
@@ -202,5 +167,38 @@ void tail_print_file(FILE *fptr, int F, int lines, int file_n_lines)
 			count++; 
 	}
 
+	fflush(stdout); 
+
+	if (F)
+		keep_reading();
+
 	fclose(fptr); 
+}
+
+void keep_reading()
+{
+	char ch; 
+	int len; 
+
+	len = ftell(fptr); 
+	printf("len : %d\n", len); 
+
+	while (1)
+	{
+		sleep(0.2); 
+		ch = fgetc(fptr); 
+		len = ftell(fptr); 
+		printf("len : %d\n", len); 
+		if (ch != EOF)
+			putchar(ch); 
+		fflush(stdout); 
+	}
+}
+
+void signalHandler(int sig)
+{
+	if (!fptr)
+		fclose(fptr); 
+
+	exit(0); 
 }

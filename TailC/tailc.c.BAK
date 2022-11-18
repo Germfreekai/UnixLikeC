@@ -125,49 +125,81 @@ void tail_print_file(FILE *fptr, int F, int lines, int file_n_lines)
 	// return file pointer to start of the file 
 	rewind(fptr); 
 
-	int print_from_line; 
-
-	int print;
+	int print; 
 	print = 0; 
-	if (lines > file_n_lines)
+
+	if (lines > file_n_lines+1)
 	{
-		if (file_n_lines <= 10)
+		if (file_n_lines <= 9)
 		{
-			print = 1; 
-			print_from_line = 0;
+			lines = 0;
 		}
 		else
 		{
-			print_from_line = file_n_lines - 10;
+			lines = file_n_lines - 9; 
 		}
 	}
 	else
 	{
-		print_from_line = file_n_lines - lines;
-		if (!print_from_line)
-			print = 1; 
+		lines = file_n_lines - (lines - 1); 
+		//if (lines != 1)
+		//{
+		//	lines = file_n_lines - (lines - 1); 
+		//}
+		//else
+		//{
+		//	lines = file_n_lines - lines;
+		//}
 	}
 
-	printf("print from: %d\n", print_from_line); 
-	printf("line: %d\n", lines); 
-	printf("file lines: %d\n", file_n_lines); 
-	int count;
-	count = 0; 
+	//if (!lines)
+	//	print = 1; 
 	char ch; 
 
+	//printf("file_n_lines = %d\n", file_n_lines); 
+	//printf("lines = %d\n", lines); 
+
+	int count; 
+	count = 0; 
+	//while (count < lines && (ch = fgetc(fptr)) != EOF)
+	//{
+	//	if (ch == 10)
+	//		count++;
+	//}
+
+	//char *str = (char*)calloc(10001, sizeof(char)); 
+	////fgets(str, 10000, fptr); 
+	/////printf("%s", str); 
+	//printf("count = %d\n", count); 
+	//
+	//while ((ch = fgetc(fptr)) != EOF)
+	//{
+	//	putchar(ch);
+	//}
 	while ((ch = fgetc(fptr)) != EOF)
 	{
-		//if (count > print_from_line || (count == print_from_line && lines == 1))
-		if (count == print_from_line+1 || (count == print_from_line+1 && lines == 1))
-		{
-			//printf("count: %d\n", count); 
-			//printf("print from lien: %d\n", print_from_line); 
-			print = 1; 
-		}
+		//if (lines == (file_n_lines - 1))
+		//{
+		//	if (count > lines)
+		//	{
+		//		printf("option 1 \n"); 
+		//		print = 1;
+		//	}
+		//}
+		//else
+		//{
+		//	if (count == lines)
+		//	{
+		//		printf("option 2 \n"); 
+		//		print = 1;
+		//	}
+		//}
+		if (count == lines)
+			print = 1;
 		if (print)
 			putchar(ch); 
 		if (ch == 10)
-			count++;
+			count++; 
 	}
 
 	fclose(fptr); 
