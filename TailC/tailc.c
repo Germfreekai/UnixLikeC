@@ -14,6 +14,8 @@ void keep_reading();
 void signalHandler(int sig); 
 
 FILE *fptr; 
+FILE *tfile;
+char *file; 
 
 int main(int argc, char *argv[argc + 1])
 {
@@ -44,12 +46,10 @@ void help(char **argv)
 
 void Tail(int argc, char **argv)
 {
-	// FILE *fptr; 
-	
 	int lines; 
 	lines = 10;
 
-	char *file = (char*)calloc(1000,sizeof(char)); 
+	file = (char*)calloc(1000,sizeof(char)); 
 
 	int F; 
 	F = 0; 
@@ -96,8 +96,7 @@ void Tail(int argc, char **argv)
 		free(file); 
 		exit(1); 
 	}
-	free(file); 
-
+	
 	int file_n_lines;
 	file_n_lines = get_file_lines_number();
 
@@ -107,7 +106,6 @@ void Tail(int argc, char **argv)
 		exit(0); 
 	}
 	
-	//tail_print_file(fptr, F, lines, file_n_lines); 
 	tail_print_file(F, lines, file_n_lines); 
 	
 }
@@ -131,7 +129,7 @@ int get_file_lines_number()
 
 void tail_print_file(int F, int lines, int file_n_lines)
 {
-	// return file pointer to start of the file 
+	// Return file pointer to start of the file 
 	rewind(fptr); 
 
 	int print; 
@@ -172,33 +170,55 @@ void tail_print_file(int F, int lines, int file_n_lines)
 	if (F)
 		keep_reading();
 
+	free(file); 
 	fclose(fptr); 
 }
 
 void keep_reading()
 {
-	char ch; 
-	int len; 
-
+	int len;
 	len = ftell(fptr); 
-	printf("len : %d\n", len); 
-
+	
+	fclose(fptr); 
+	
+	char ch; 
+	int slen; 
+	
 	while (1)
 	{
-		sleep(0.2); 
-		ch = fgetc(fptr); 
-		len = ftell(fptr); 
-		printf("len : %d\n", len); 
-		if (ch != EOF)
-			putchar(ch); 
+		// Wait for new lines to add
+		sleep(3);
+
+		tfile = fopen(file, "r"); 
+		fseek(tfile, 0L, SEEK_END); 
+		slen = ftell(tfile); 
+		
+		// If file is bigger, print new things
+		if (slen > len)
+		{
+			// Where to start writting again
+			fseek(tfile, len, SEEK_SET);
+
+			while ((ch = fgetc(tfile)) != EOF)
+				putchar(ch);
+			
+			// new reference point
+			len = slen;
+		}
+
+		fclose(tfile);
+		
 		fflush(stdout); 
 	}
+
 }
 
 void signalHandler(int sig)
 {
-	if (!fptr)
-		fclose(fptr); 
+	if (!tfile)
+		fclose(tfile); 
 
+	free(file); 
+	
 	exit(0); 
 }
