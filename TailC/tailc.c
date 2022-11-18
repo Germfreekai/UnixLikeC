@@ -136,54 +136,71 @@ void tail_print_file(FILE *fptr, int F, int lines, int file_n_lines)
 		}
 		else
 		{
-			lines = 9; 
+			lines = file_n_lines - 9; 
 		}
 	}
 	else
 	{
-		if (lines != 1)
-		{
-			lines = file_n_lines - (lines - 1); 
-		}
-		else
-		{
-			lines = file_n_lines - lines;
-		}
+		lines = file_n_lines - (lines - 1); 
+		//if (lines != 1)
+		//{
+		//	lines = file_n_lines - (lines - 1); 
+		//}
+		//else
+		//{
+		//	lines = file_n_lines - lines;
+		//}
 	}
 
-	if (!lines)
-		print = 1; 
+	//if (!lines)
+	//	print = 1; 
 	char ch; 
 
-	printf("file_n_lines = %d\n", file_n_lines); 
-	printf("lines = %d\n", lines); 
+	//printf("file_n_lines = %d\n", file_n_lines); 
+	//printf("lines = %d\n", lines); 
 
 	int count; 
 	count = 0; 
-	while (count < lines && (ch = fgetc(fptr)) != EOF)
-	{
-		if (ch == 10)
-			count++;
-	}
+	//while (count < lines && (ch = fgetc(fptr)) != EOF)
+	//{
+	//	if (ch == 10)
+	//		count++;
+	//}
 
-	char *str = (char*)calloc(10001, sizeof(char)); 
-	//fgets(str, 10000, fptr); 
-	///printf("%s", str); 
-	printf("count = %d\n", count); 
-	
-	while ((ch = fgetc(fptr)) != EOF)
-	{
-		putchar(ch);
-	}
+	//char *str = (char*)calloc(10001, sizeof(char)); 
+	////fgets(str, 10000, fptr); 
+	/////printf("%s", str); 
+	//printf("count = %d\n", count); 
+	//
 	//while ((ch = fgetc(fptr)) != EOF)
 	//{
-	//	if (count == lines)
-	//		print = 1;
-	//	if (print)
-	//		putchar(ch); 
-	//	if (ch == 10)
-	//		count++; 
+	//	putchar(ch);
 	//}
+	while ((ch = fgetc(fptr)) != EOF)
+	{
+		//if (lines == (file_n_lines - 1))
+		//{
+		//	if (count > lines)
+		//	{
+		//		printf("option 1 \n"); 
+		//		print = 1;
+		//	}
+		//}
+		//else
+		//{
+		//	if (count == lines)
+		//	{
+		//		printf("option 2 \n"); 
+		//		print = 1;
+		//	}
+		//}
+		if (count == lines)
+			print = 1;
+		if (print)
+			putchar(ch); 
+		if (ch == 10)
+			count++; 
+	}
 
 	fclose(fptr); 
 }
