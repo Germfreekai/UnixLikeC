@@ -20,11 +20,15 @@ typedef struct
 
 // Thread for navigate and count new Dir
 void* foundNewDir(void* vargs); 
+void Help(char *fname);
 
 int main(int argc, char* argv[argc+1])
 {
 
 	assert(argc == 2 && "ERR: Wrong usage || Correct form: ./FILENAME <directory>");
+
+	if (!strcmp(argv[1],"-h"))
+		Help(argv[0]);
 
 	// Initialize struct (args)
 	Args* dirInf = (Args*)malloc(sizeof(Args));
@@ -44,6 +48,12 @@ int main(int argc, char* argv[argc+1])
 
 	return EXIT_SUCCESS; 
 
+}
+
+void Help(char *fname)
+{
+	printf("Usage: %s <-h> <dir>\n    -h    Show help message\n", fname);
+	exit(0);
 }
 
 // Compartimos memoria en el Struct

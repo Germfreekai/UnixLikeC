@@ -6,11 +6,19 @@
 #include <stdlib.h>
 #include <assert.h> 
 #include <unistd.h> 
+#include <string.h>
+
+void Help(char *fname);
 
 int main(int argc, char *argv[argc + 1])
 {
 	assert(argc == 2 && "Wrong usage - ./cdc <dir>"); 
 
+	if (!strcmp(argv[1],"-h"))
+	{
+		Help(argv[0]);
+		exit(0);
+	}
 	char cwd[100]; 
 
 	getcwd(cwd, sizeof(cwd)); 
@@ -29,4 +37,7 @@ err:
 	return EXIT_FAILURE; 
 }
 
-
+void Help(char *fname)
+{
+	printf("Usage:\n%s <dir>\n     -h    Show help message\n", fname);
+}

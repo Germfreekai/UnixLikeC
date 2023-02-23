@@ -7,8 +7,8 @@
 #include <assert.h>
 #include <string.h>
 
-void Flag(char *opt); 
-void Help(); 
+void Flag(char *opt, char* fname); 
+void Help(char *fname); 
 void PrintFiles(char **argv, int argc);
 
 int main(int argc, char *argv[argc + 1])
@@ -20,9 +20,13 @@ int main(int argc, char *argv[argc + 1])
 		char *opt = (char*)calloc(3,sizeof(char));
 		strcpy(opt, argv[1]); 
 		
-		Flag(opt); 
+		char *fname = (char*)calloc(100, sizeof(argv[0]));
+		strcpy(fname, argv[0]);
+
+		Flag(opt, fname); 
 		
 		free(opt);
+		free(fname);
 		
 		exit(0);
 	}
@@ -32,26 +36,27 @@ int main(int argc, char *argv[argc + 1])
 	return EXIT_SUCCESS;
 }
 
-void Flag(char *opt)
+void Flag(char *opt, char* fname)
 {
 	if(opt[0] == '-')
 	{
 		if(opt[1] == 'h')
 		{
-			Help();
+			Help(fname);
 		}
 		else
 		{
 			printf("Wrong flag, run with -h\n"); 
 			free(opt); 
+			free(fname);
 			exit(1); 
 		}
 	}
 }
 
-void Help()
+void Help(char* fname)
 {
-	printf("Usage:\n./executable < args >\n"); 
+	printf("Usage:\n%s < args >\n", fname); 
 	printf("    -h    Show help\n"); 
 }
 

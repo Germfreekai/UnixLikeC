@@ -33,7 +33,7 @@ void Help(char **argv)
 		exit(EXIT_FAILURE); 
 	}
 
-	printf("Usage - ./headc <args> <file> \n"); 
+	printf("Usage - %s <args> <file> \n", argv[0]); 
 	printf("      -h               Show usage\n"); 
 	printf("      -n <n lines>     Number of lines to show\n"); 
 

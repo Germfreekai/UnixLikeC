@@ -17,7 +17,7 @@ typedef struct
 	char *dir_n; 
 }Args;
 
-void Help(void); 
+void Help(char* fname); 
 Args *GetFlags(int argc, char **argv); 
 void PrintError(void);
 void FreeStruct(Args *args);
@@ -77,10 +77,10 @@ Args *GetFlags(int argc, char **argv)
 		{
 			if (flag[1] ==  'h')
 			{
-				Help();
+				Help(argv[0]);
 				FreeStruct(args);
 				free(flag); 
-				exit(2); 
+				exit(0); 
 			}
 			else if (flag[1] == 'f')
 			{
@@ -124,10 +124,10 @@ err:
 	exit(2); 
 }
 
-void Help(void)
+void Help(char *fname)
 {
 	printf("Usage: \n"); 
-	printf("./FILENME <-h> <-f:filename> <-d:dirname>\n"); 
+	printf("%s <-h> <-f:filename> <-d:dirname>\n", fname); 
 	printf("     -h           Usage menu\n"); 
 	printf("     -f filename  String to look for\n"); 
 	printf("     -d dirname   Directory in which we will look for\n"); 

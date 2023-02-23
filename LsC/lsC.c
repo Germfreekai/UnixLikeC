@@ -17,9 +17,13 @@ typedef struct
 
 void GetDir(Args *args); 
 void *PrintDir(void *vargs); 
+void Help(char *fname);
 
 int main(int argc, char *argv[argc + 1])
 {
+	if (!strcmp(argv[1], "-h"))
+		Help(argv[0]);
+	
 	Args *args = (Args*)malloc(sizeof(Args)); 
 	args->argv = argv;
 	args->argc = argc;
@@ -29,6 +33,12 @@ int main(int argc, char *argv[argc + 1])
 	free(args); 
 
 	return EXIT_SUCCESS;
+}
+
+void Help(char *fname)
+{
+	printf("Usage: \n%s <-h> <dir>\n    -h    Show help messagen\n", fname);
+	exit(0);
 }
 
 void GetDir(Args *args)
