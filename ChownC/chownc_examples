@@ -1,0 +1,54 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <string.h>
+#include <sys/stat.h>
+#include <pwd.h>
+#include <grp.h>
+#include <assert.h>
+
+void Help(char *fname); 
+
+int main(int argc, char *argv[argc + 1])
+{
+	if (argc < 2){ printf("Missing args, run with <-h>\n"); exit(1); }
+	if (!strcmp("-h", argv[1])) Help(argv[0]);
+
+	struct stat info;
+	stat(argv[1], &info);
+
+	struct passwd *pw = getpwnam("renegarc");
+	struct passwd *fpw = getpwuid(info.st_uid);
+	// struct group *gr = getgrgid(info.st_gid);
+
+	if (!pw || !fpw)
+	{
+		printf("Could not get user or group UID\n");
+		exit(1);
+	}
+
+	printf("user login name: %s\n", pw->pw_name);
+	//printf("user ID: %s\n", pw->pw_uid);
+	//printf("group ID: %s\n", pw->pw_gid);
+	printf("user full name: %s\n", pw->pw_gecos);
+	printf("user login directory: %s\n", pw->pw_dir);
+	printf("user login shell: %s\n", pw->pw_shell);
+
+	printf("///////// FROM FILE \n");
+	
+	printf("user login name: %s\n", fpw->pw_name);
+	//printf("user ID: %s\n", pw->pw_uid);
+	//printf("group ID: %s\n", pw->pw_gid);
+	printf("user full name: %s\n", fpw->pw_gecos);
+	printf("user login directory: %s\n", fpw->pw_dir);
+	printf("user login shell: %s\n", fpw->pw_shell);
+
+	return EXIT_SUCCESS;
+
+}
+
+void Help(char *fname)
+{
+	printf("Usage:\n%s <-h> <user>:<group> <file>\n    -h    Show help message\n", fname);
+	exit(0);
+}
