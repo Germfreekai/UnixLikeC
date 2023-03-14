@@ -37,11 +37,25 @@ int main (int argc, char *argv[argc + 1])
 	printf("user uid: %d\n", pw->pw_uid);
 	printf("user gid: %d\n", pw->pw_gid);
 
+	fprintf(stdout,"File info before change\n");
+	struct stat info;
+	stat(fname, &info);
+	fprintf(stdout, "File owner UID: %d\n", info.st_uid);
+	fprintf(stdout, "File type: %3o\n", info.st_mode);
+	struct passwd *prev = getpwuid(info.st_uid);
+	fprintf(stdout, "File owner name: %s\n", prev->pw_name);
 	if (chown (fname, pw->pw_uid, pw->pw_gid) == -1)
 	{
 		fprintf(stderr, "Could not change owner\n");
 		exit(EXIT_FAILURE);
 	}
+	
+	fprintf(stdout, "File info after change\n");
+	stat(fname, &info);
+	fprintf(stdout, "File owner UID: %d\n", info.st_uid);
+	fprintf(stdout, "File type: %3o\n", info.st_mode);
+	prev = getpwuid(info.st_uid);
+	fprintf(stdout, "File owner name: %s\n", prev->pw_name);
 	return EXIT_SUCCESS;
 }
 
