@@ -1,3 +1,9 @@
+/*
+ * Author: Rene Garcia Aviles
+ * Mkdir like C implementation
+ * Contact: renega1238@gmail.com
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/stat.h>
