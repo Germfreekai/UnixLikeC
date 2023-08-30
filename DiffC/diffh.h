@@ -17,5 +17,4 @@ void *_open_file(char *fpath);
 int _file_size(FILE *fptr);
 int compare_files(FILE *src_file, FILE *dst_file);
 
-char _read_file_char(FILE* fptr);
 void print_diff(char *buffer, int line, int status);

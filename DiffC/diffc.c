@@ -134,7 +134,7 @@ void free_target_info(TargetInfo *target_info)
 }
 
 /*
- * Verif if given path is a valid directory
+ * Verify if given path is a valid directory
  * Returns 
  *  - 0 valid
  *  - 1 invalid
@@ -251,12 +251,12 @@ int compare_files(FILE *src_file, FILE *dst_file)
         // Bring chars and add to buffer
         if (src_read)
         {
-            src_ch = _read_file_char(src_file);
+            src_ch = fgetc(src_file);
             strncat(src_line_buffer, &src_ch, 1);
         }
         if (dst_read)
         {
-            dst_ch = _read_file_char(dst_file);
+            dst_ch = fgetc(dst_file);
             strncat(dst_line_buffer, &dst_ch, 1);
         }
 
@@ -305,14 +305,6 @@ int compare_files(FILE *src_file, FILE *dst_file)
     free(dst_line_buffer);
 
     return files_different;
-}
-
-/*
- * Read file and extract a single line buffer
- */
-char _read_file_char(FILE* fptr)
-{
-    return fgetc(fptr);
 }
 
 /*
